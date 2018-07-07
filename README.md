@@ -12,6 +12,8 @@ Not all lessons in this course use starter apps.
 
 Code for all the other apps in this course are in a different repository.
 
+Meant to make the change on the 'mkh' branch...
+
 Introduction
 ------------
 

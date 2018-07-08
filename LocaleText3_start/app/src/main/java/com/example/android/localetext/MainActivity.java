@@ -23,6 +23,7 @@ import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,7 +33,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Currency;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -41,10 +47,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class MainActivity extends AppCompatActivity {
 
+    private static final String LTAG = MainActivity.class.getSimpleName();
+
     // Default quantity is 1.
     private int mInputQuantity = 1;
 
     // TODO: Get the number format for this locale.
+    private final NumberFormat numberInstance = NumberFormat.getNumberInstance();
 
     // Fixed price in U.S. dollars and cents: ten cents.
     private double mPrice = 0.10;
@@ -54,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     double mIwExchangeRate = 3.61; // 3.61 new shekels = $1.
 
     // TODO: Get locale's currency.
+    private final Currency currency = Currency.getInstance(Locale.getDefault());
 
     /**
      * Creates the view with a toolbar for the options menu
@@ -83,7 +93,8 @@ public class MainActivity extends AppCompatActivity {
         // Set the expiration date as the date to display.
         myDate.setTime(expirationDate);
 
-        // TODO: Format the date for the locale.
+        // TODO: DONE: Format the date for the locale.
+        ((TextView) findViewById(R.id.date)).setText(DateFormat.getDateInstance().format(myDate));
 
         // TODO: Apply the exchange rate and calculate the price.
 
@@ -102,24 +113,35 @@ public class MainActivity extends AppCompatActivity {
                             (Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
                     // Check if view v is empty.
-                    if (v.toString().equals("")) {
-                        // Don't format, leave alone.
+                    String input = v.getText().toString();
+                    if (!input.trim().equals("")) {
+                        try {
+                            // TODO: DONE: Parse string in view v to a number.
+                            int value = numberInstance.parse(input).intValue();
+                            v.setText(numberInstance.format(value));
+                            v.setError(null);
+                            // TODO: DONE: Convert to string using locale's number format.
+                            v.setText(numberInstance.format(value));
+
+                            // TODO: Homework: Calculate the total amount from price and quantity.
+
+                            // TODO: Homework: Use currency format for France (FR) or Israel (IL).
+
+                            // TODO: Homework: Show the total amount string.
+
+                            return true;
+                        } catch (ParseException e) {
+                            Log.e(LTAG, e.getLocalizedMessage(), e);
+                            v.setError(getText(R.string.enter_a_number));
+                            e.printStackTrace();
+                            return false;
+                        }
                     } else {
-
-                        // TODO: Parse string in view v to a number.
-
-                        // TODO: Convert to string using locale's number format.
-
-                        // TODO: Homework: Calculate the total amount from price and quantity.
-
-                        // TODO: Homework: Use currency format for France (FR) or Israel (IL).
-
-                        // TODO: Homework: Show the total amount string.
-
                         return true;
                     }
+                } else {
+                    return false;
                 }
-                return false;
             }
         });
     }
@@ -146,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Creates the options menu and returns true.
      *
-     * @param menu       Options menu
+     * @param menu Options menu
      * @return boolean   True after creating options menu.
      */
     @Override
@@ -159,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Handles options menu item clicks.
      *
-     * @param item      Menu item
+     * @param item Menu item
      * @return boolean  True if menu item is selected.
      */
     @Override
